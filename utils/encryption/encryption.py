@@ -1,6 +1,3 @@
-#Aleksander Olewinski
-#Andi Latifi
-
 from cryptography.fernet import Fernet
 import os
 import yaml

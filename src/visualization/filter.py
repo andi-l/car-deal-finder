@@ -1,6 +1,5 @@
-#Lenny Langelotz
-
 import streamlit as st
+
 
 
 def create_filter_sidebar(df):

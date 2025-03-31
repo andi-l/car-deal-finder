@@ -1,6 +1,5 @@
-#Julian Reis
-
 import sqlite3
+
 
 from filter import create_filter_sidebar, apply_filters
 

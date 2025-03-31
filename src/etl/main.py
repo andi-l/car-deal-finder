@@ -1,5 +1,3 @@
-#Lenny Langelotz
-
 from src.etl.extraction import DataExtractor
 from src.etl.transformation import DataTransformer
 from load import DatabaseLoader

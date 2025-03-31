@@ -1,5 +1,3 @@
-#Lenny Langelotz
-
 import pandas as pd
 
 

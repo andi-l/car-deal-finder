@@ -1,5 +1,3 @@
-#Aleksander Olewinski
-
 import sqlite3
 import yaml
 
