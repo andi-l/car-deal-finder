@@ -1,0 +1,61 @@
+database:
+  encrypted_name: gAAAAABnoNiT-Lg0r0J2xikJV1J0nfeRvAZQud-sAIZW_kvt9JDhPadVaPSWHB6UAl67RB9YnmW-HI-a0SsB4R6OVT2IKyDmNg==
+  encrypted_password: gAAAAABnoNiTtOSQ8WUVYoS3sEwC012YDNPWxT_dysVyh0TLNLvUzJlYosza8vDjWElYEo9DlgmboXMtWQmAKjtrHb6xZmGdpA==
+  paths:
+    config: ../../resources/config/db_config.yaml
+    database: ../../resources/used_cars.db
+    raw_data: ../../resources/UsedCarDataset.csv
+    transformed_csv: ../../resources/transformed_data.csv
+  queries:
+    create_brands_table: "CREATE TABLE IF NOT EXISTS Brands (\n  brand_id INTEGER\
+      \ PRIMARY KEY AUTOINCREMENT,\n  brand_name TEXT UNIQUE NOT NULL\n);\n"
+    create_cars_table: "CREATE TABLE IF NOT EXISTS Cars (\n  car_id INTEGER PRIMARY\
+      \ KEY AUTOINCREMENT,\n  brand_id INTEGER,\n  model_id INTEGER,\n  year INTEGER,\n\
+      \  age INTEGER,\n  km_driven REAL,\n  transmission_id INTEGER,\n  owner_id INTEGER,\n\
+      \  fuel_type_id INTEGER,\n  ask_price REAL,\n  price_per_km REAL,\n  brand_model\
+      \ TEXT,\n  price_per_km_mean REAL,\n  relative_price REAL,\n  price_classification_id\
+      \ INTEGER,\n  FOREIGN KEY (brand_id) REFERENCES Brands(brand_id),\n  FOREIGN\
+      \ KEY (model_id) REFERENCES Models(model_id),\n  FOREIGN KEY (transmission_id)\
+      \ REFERENCES Transmission(transmission_id),\n  FOREIGN KEY (owner_id) REFERENCES\
+      \ Owners(owner_id),\n  FOREIGN KEY (fuel_type_id) REFERENCES FuelTypes(fuel_type_id),\n\
+      \  FOREIGN KEY (price_classification_id) REFERENCES Price_Classifications(price_classification_id)\n\
+      );\n"
+    create_cars_view: "CREATE VIEW IF NOT EXISTS car_view AS\nSELECT\n  c.car_id,\n\
+      \  b.brand_name AS brand,\n  m.model_name AS model,\n  c.km_driven AS kmdriven,\n\
+      \  c.age,\n  c.ask_price AS askprice,\n  c.relative_price AS relativeprice,\n\
+      \  pc.price_classification AS priceclassification\nFROM\n  Cars c\nJOIN Models\
+      \ m ON c.model_id = m.model_id\nJOIN Brands b ON m.brand_id = b.brand_id\nJOIN\
+      \ Price_Classifications pc ON c.price_classification_id = pc.price_classification_id;\n"
+    create_fuel_types_table: "CREATE TABLE IF NOT EXISTS FuelTypes (\n  fuel_type_id\
+      \ INTEGER PRIMARY KEY AUTOINCREMENT,\n  fuel_type TEXT UNIQUE NOT NULL\n);\n"
+    create_models_table: "CREATE TABLE IF NOT EXISTS Models (\n  model_id INTEGER\
+      \ PRIMARY KEY AUTOINCREMENT,\n  brand_id INTEGER,\n  model_name TEXT NOT NULL,\n\
+      \  FOREIGN KEY (brand_id) REFERENCES Brands(brand_id)\n);\n"
+    create_owners_table: "CREATE TABLE IF NOT EXISTS Owners (\n  owner_id INTEGER\
+      \ PRIMARY KEY AUTOINCREMENT,\n  owner_type TEXT UNIQUE NOT NULL\n);\n"
+    create_price_classifications_table: "CREATE TABLE IF NOT EXISTS Price_Classifications\
+      \ (\n  price_classification_id INTEGER PRIMARY KEY AUTOINCREMENT,\n  price_classification\
+      \ TEXT UNIQUE NOT NULL\n);\n"
+    create_transmission_table: "CREATE TABLE IF NOT EXISTS Transmission (\n  transmission_id\
+      \ INTEGER PRIMARY KEY AUTOINCREMENT,\n  transmission_type TEXT UNIQUE NOT NULL\n\
+      );\n"
+    drop_view: DROP VIEW IF EXISTS car_view;
+    insert_brand: INSERT OR IGNORE INTO Brands (brand_name) VALUES (?);
+    insert_car: "INSERT INTO Cars (\n  brand_id, model_id, year, age, km_driven,\n\
+      \  transmission_id, owner_id, fuel_type_id,\n  ask_price, price_per_km, brand_model,\n\
+      \  price_per_km_mean, relative_price,\n  price_classification_id\n) VALUES (\n\
+      \  (SELECT brand_id FROM Brands WHERE brand_name = ?),\n  (SELECT model_id FROM\
+      \ Models WHERE model_name = ? AND brand_id = (SELECT brand_id FROM Brands WHERE\
+      \ brand_name = ?)),\n  ?, ?, ?, \n  (SELECT transmission_id FROM Transmission\
+      \ WHERE transmission_type = ?),\n  (SELECT owner_id FROM Owners WHERE owner_type\
+      \ = ?),\n  (SELECT fuel_type_id FROM FuelTypes WHERE fuel_type = ?),\n  ?, ?,\
+      \ ?, ?, ?,\n  (SELECT price_classification_id FROM Price_Classifications WHERE\
+      \ price_classification = ?)\n);\n"
+    insert_fuel_type: INSERT OR IGNORE INTO FuelTypes (fuel_type) VALUES (?);
+    insert_model: INSERT OR IGNORE INTO Models (brand_id, model_name) VALUES ((SELECT
+      brand_id FROM Brands WHERE brand_name = ?), ?);
+    insert_owner: INSERT OR IGNORE INTO Owners (owner_type) VALUES (?);
+    insert_price_classification: INSERT OR IGNORE INTO Price_Classifications (price_classification)
+      VALUES (?);
+    insert_transmission: INSERT OR IGNORE INTO Transmission (transmission_type) VALUES
+      (?);
